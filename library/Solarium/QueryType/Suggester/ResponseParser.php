@@ -92,4 +92,34 @@ class ResponseParser extends ResponseParserAbstract implements ResponseParserInt
             )
         );
     }
+
+    /**
+     * @param $data
+     * @return array
+     *
+     * Overwritten due to false handling if term contains duplicate.
+     * If there is a resultset for "term", the lookup for "term term" due the way the array is handled.
+     *
+     */
+    public function convertToKeyValueArray($data)
+    {
+        // key counter to convert values to arrays when keys are re-used
+        $keys = array();
+
+        $result = array();
+        for ($i = 0; $i < count($data); $i += 2) {
+
+            $key  = $data[$i];
+            $value = $data[$i+1];
+            if (array_key_exists($key, $keys)) {
+                $result[$key][] = $value;
+                $keys[$key]++;
+            } else {
+                $keys[$key] = 1;
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
 }
